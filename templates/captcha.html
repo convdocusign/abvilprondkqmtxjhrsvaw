@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Проверка на сигурността</title>
+
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+
+  <style>
+    :root {
+      --bg: #064E3B;
+      --card: #ffffff;
+      --text: #263238;
+      --muted: #d1fae5;
+      --green: #00966e;
+      --green-dark: #007a59;
+      --red: #d62612;
+      --border: #d9dee3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    .brand {
+      width: 100%;
+      max-width: 430px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+
+      background: linear-gradient(
+        to bottom,
+        #ffffff 0%,
+        #ffffff 33%,
+        var(--green) 33%,
+        var(--green) 66%,
+        var(--red) 66%,
+        var(--red) 100%
+      );
+
+      border: 1px solid #d5d5d5;
+      box-shadow: 0 3px 10px rgba(0,0,0,.15);
+    }
+
+    h1 {
+      font-size: 27px;
+      font-weight: 500;
+      margin: 0 0 8px;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #d1fae5;
+      margin: 0 0 25px;
+      text-align: center;
+    }
+
+    #captcha-container {
+      width: 250px;
+      height: 100px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 5px;
+
+      color: #ffffff;
+      background-color: {{ color }};
+
+      border-radius: 10px;
+      margin: 0 auto 18px;
+
+      box-shadow: 0 5px 18px rgba(0,0,0,.25);
+
+      transition: transform .2s ease;
+    }
+
+    #captcha-container:hover {
+      transform: scale(1.03);
+    }
+
+    #captcha-form {
+      width: 100%;
+      max-width: 430px;
+
+      background: var(--card);
+      padding: 28px;
+
+      border-radius: 10px;
+
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+
+      border-top: 4px solid var(--green);
+    }
+
+    #captcha-input {
+      width: 100%;
+      padding: 13px 14px;
+      margin-top: 5px;
+
+      border: 1px solid var(--border);
+      border-radius: 6px;
+
+      font-size: 16px;
+      color: var(--text);
+      background: #ffffff;
+
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    #captcha-input:focus {
+      border-color: var(--green);
+
+      box-shadow:
+        0 0 0 3px rgba(0,150,110,.15);
+
+      outline: none;
+    }
+
+    #captcha-submit {
+      width: 100%;
+      padding: 13px;
+      margin-top: 14px;
+
+      border: none;
+      border-radius: 6px;
+
+      font-size: 16px;
+      font-weight: 500;
+
+      background-color: var(--green);
+      color: #ffffff;
+
+      cursor: pointer;
+
+      transition:
+        background-color .2s,
+        transform .2s;
+    }
+
+    #captcha-submit:hover {
+      background-color: var(--green-dark);
+      transform: translateY(-1px);
+    }
+
+    #captcha-message {
+      color: var(--red);
+      text-align: center;
+
+      margin-top: 14px;
+
+      display: none;
+
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #b7e4d3;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+
+      #captcha-form {
+        width: calc(100% - 30px);
+        padding: 22px;
+      }
+
+      #captcha-container {
+        width: 220px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="brand">
+
+    <div class="brand-mark"></div>
+
+    <h1>
+      Проверка на сигурността
+    </h1>
+
+    <p class="subtitle">
+      Моля, въведете показания код, за да продължите.
+    </p>
+
+  </div>
+
+  <div id="captcha-container">
+    {{ code }}
+  </div>
+
+  <form
+    id="captcha-form"
+    method="POST"
+    action="{{ url_for('captcha') }}"
+  >
+
+    <input
+      id="captcha-input"
+      type="text"
+      placeholder="Въведете кода"
+      name="code"
+      autocomplete="off"
+      required
+    >
+
+    <input
+      type="hidden"
+      name="web"
+      value="{{ eman }}"
+    >
+
+    <button
+      id="captcha-submit"
+      type="submit"
+    >
+      Продължи
+    </button>
+
+    <p id="captcha-message"></p>
+
+  </form>
+
+  <div class="footer">
+    Защитена проверка • България
+  </div>
+
+  <script>
+    var captchaForm =
+      document.getElementById('captcha-form');
+
+    var errorMessage =
+      document.getElementById('captcha-message');
+
+    captchaForm.addEventListener(
+      'submit',
+      function(event) {
+
+        event.preventDefault();
+
+        var captchaInput =
+          document.getElementById('captcha-input');
+
+        var correctCode =
+          "{{ code }}";
+
+        if (captchaInput.value == correctCode) {
+
+          captchaForm.submit();
+
+        } else {
+
+          errorMessage.innerText =
+            'Въведеният код е неправилен. Моля, опитайте отново.';
+
+          errorMessage.style.display =
+            'block';
+
+          captchaInput.value = '';
+
+          captchaInput.focus();
+        }
+      }
+    );
+  </script>
+
+</body>
+</html>
